@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: stg_lol_matches
+    description: "Cleaned match-level records for daowy#na1 from the Riot Match-V5 API."
+    columns:
+      - name: match_id
+        description: "Unique Riot match identifier."
+        tests:
+          - unique
+          - not_null
+      - name: champion_name
+        tests:
+          - not_null
+      - name: is_win
+        tests:
+          - not_null
+
+  - name: fct_champion_winrate
+    description: "Per-champion games played, win rate percentage, and KDA summary."
+    columns:
+      - name: champion_name
+        tests:
+          - unique
+          - not_null
+      - name: games_played
+        tests:
+          - not_null
