@@ -13,6 +13,8 @@ An end-to-end ELT data pipeline built with **Apache Airflow**, **PostgreSQL**, *
 3. **Data Quality Testing (dbt):**
    - Automated schema tests (`unique`, `not_null`) validate primary keys and critical metrics across staging and mart models (`PASS=7`).
 
+   ![Airflow DAG Execution](images/DagRun.png)
+
 ## Sample Output (`analytics.fct_champion_winrate`)
 
 ```sql
