@@ -19,9 +19,9 @@ def lol_match_tracker_dag():
         headers = {"X-Riot-Token": api_key}
         routing = "https://americas.api.riotgames.com"
 
-        game_name = "daowy"
-        tag_line = "na1"
-        match_count = 20
+        game_name = os.environ.get("RIOT_GAME_NAME", "Tyler12345BB")
+        tag_line = os.environ.get("RIOT_TAG_LINE", "na1")
+        match_count = int(os.environ.get("RIOT_MATCH_COUNT", "20"))
 
         acct_resp = requests.get(
             f"{routing}/riot/account/v1/accounts/by-riot-id/{game_name}/{tag_line}",

@@ -6,7 +6,7 @@ An end-to-end ELT data pipeline built with **Apache Airflow**, **PostgreSQL**, *
 
 1. **Extract & Load (Airflow + PostgreSQL):**
    - `lol_match_tracker_dag` resolves a player's PUUID via the Riot Account API, fetches recent match IDs and match stats, and loads them into PostgreSQL (`public.raw_lol_matches`).
-   - Uses `ON CONFLICT DO NOTHING` upserts so scheduled or manual runs remain idempotent without creating duplicate match records.
+   - Uses 'ON CONFLICT (match_id) DO UPDATE' upserts so scheduled or manual runs remain idempotent without creating duplicate match records.
 2. **Transform (dbt):**
    - `analytics.stg_lol_matches` — cleans, casts, and normalizes raw match fields into a typed staging view.
    - `analytics.fct_champion_winrate` — aggregates games played, wins, losses, win rate percentage, and average KDA metrics per champion.
@@ -69,9 +69,39 @@ lol-airflow-dbt-pipeline/
 3. **Trigger the ELT pipeline:**
    - Open the Airflow UI at `http://localhost:8080`, unpause `lol_match_tracker_dag`, and trigger a run.
 
-4. **Run dbt transformations and tests:**
+4. **Set up the local Python and dbt environment:**
    ```bash
-   cd ../dbt
+   cd ..
+   python3 -m venv .venv
+   source .venv/bin/activate
+   pip install dbt-postgres
+   ```
+
+5. **Configure `~/.dbt/profiles.yml`:**
+   Create `~/.dbt/profiles.yml` with the connection details below (ensure the top-level profile key matches `profile:` in `dbt/dbt_project.yml`):
+   ```yaml
+   lol_analytics:
+     target: dev
+     outputs:
+       dev:
+         type: postgres
+         host: localhost
+         user: airflow
+         password: airflow
+         port: 5432
+         dbname: lol_analytics
+         schema: analytics
+         threads: 1
+   ```
+
+6. **Run dbt transformations and tests:**
+   ```bash
+   cd dbt
    dbt run
    dbt test
+   ```
+
+   7. **Query the final analytics table in PostgreSQL:**
+   ```bash
+   cd ../airflow && docker compose exec postgres psql -U airflow -d lol_analytics -c "SELECT * FROM analytics.fct_champion_winrate ORDER BY games_played DESC, win_rate_pct DESC LIMIT 5;"
    ```
