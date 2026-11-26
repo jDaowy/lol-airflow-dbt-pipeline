@@ -101,7 +101,7 @@ lol-airflow-dbt-pipeline/
    dbt test
    ```
 
-   7. **Query the final analytics table in PostgreSQL:**
+7. **Query the final analytics table in PostgreSQL:**
    ```bash
    cd ../airflow && docker compose exec postgres psql -U airflow -d lol_analytics -c "SELECT * FROM analytics.fct_champion_winrate ORDER BY games_played DESC, win_rate_pct DESC LIMIT 5;"
    ```
